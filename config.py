@@ -41,6 +41,15 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
+    
+    def __init__(self):
+        super().__init__()
+        # Override MongoDB settings for production
+        self.MONGODB_SETTINGS = {
+            'db': os.environ.get('MONGO_DB', 'ai_product_mgmt'),
+            'host': os.environ.get('MONGO_URI', 'mongodb://localhost:27017/ai_product_mgmt'),
+            'connect': False
+        }
 
 # Set the active configuration
 config = {

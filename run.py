@@ -3,14 +3,17 @@ from flask_cors import CORS
 from app import create_app
 
 # Create the Flask app instance
-app = create_app(os.getenv('FLASK_ENV') or 'default')
+app = create_app(os.getenv('FLASK_ENV', 'development'))
 
 # Configure CORS
+# Allow frontend origin from Railway environment variable
+frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+
 CORS(
     app,
     resources={
         r"/api/*": {
-            "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
+            "origins": [frontend_url, "http://localhost:3000", "http://127.0.0.1:3000"],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
@@ -47,4 +50,6 @@ if __name__ == '__main__':
         os.makedirs(upload_folder, exist_ok=True)
     
     # Run the application
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.getenv('PORT', 5000))
+    debug = os.getenv('FLASK_ENV') == 'development'
+    app.run(debug=debug, host='0.0.0.0', port=port)
